@@ -1,3 +1,13 @@
+@import 'foundation';
+
 // Place all the styles related to the cranes controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+article {
+  @include grid-column(8,$center:true);
+}
+
+#map-canvas {
+  width: 100%;
+  height: 600px;
+}

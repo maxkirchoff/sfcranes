@@ -1,0 +1,32 @@
+<article>
+  <a class="button" href="/cranes/new">Mark a New Crane</a>
+  <div id="map-canvas"></div>
+
+</article>
+
+<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyDXfNaXEyjTt3epqkuCv71f0a9iST4vZCI&sensor=true"></script>
+<script>
+  $(document).ready(function () {
+    var coords = new google.maps.LatLng('37.7745659', '-122.4214918');
+    var options = {
+      zoom: 12,
+      center: coords,
+      mapTypeControl: false,
+      navigationControlOptions: {
+        style: google.maps.NavigationControlStyle.SMALL
+      },
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    var map = new google.maps.Map(document.getElementById("map-canvas"), options);
+
+    <% @cranes.each do |crane| %>
+      var craneCoords = new google.maps.LatLng(<%= crane.lat %>, <%= crane.lon %>)
+      new google.maps.Marker({
+        draggable: true,
+        position: craneCoords,
+        map: map,
+        title:<%= crane.title || 'A crane' %>
+      });
+    <% end %>
+  });
+</script>

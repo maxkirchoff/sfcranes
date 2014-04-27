@@ -1,50 +1,158 @@
-<h1>Jeah?</h1>
-<%= form_for :crane, url: cranes_path do |f| %>
-  <p>
-    <%= f.label :title %><br>
-    <%= f.text_field :title %>
-  </p>
+<article>
 
-  <p>
-    <%= f.label :notes %><br>
-    <%= f.text_area :notes %>
-  </p>
+  <section id="mark-crane">
+    <h1></h1>
+    <button type="button" data-use-geolocation="true">Use my Location</button>
+    <br />
+    <button type="button">Locate Manually</button>
+  </section>
 
-  <p>
-    <%= f.label :address %><br>
-    <%= f.text_area :address %>
-  </p>
+  <section id="locate">
+    <h1></h1>
+    <div id="map-canvas"></div>
+    <input type="hidden" name="latitude" value="">
+    <input type="hidden" name="longitude" value="">
+    <button type="button">Save Crane Location</button>
+  </section>
 
-  <p>
-    Geo
-    <%= f.text_field :lat, :disabled => true %>
-    <%= f.text_field :lon, :disabled => true %>
-    <button id="get-geo" type="button">Get Current Location</button>
-  </p>
+  <section id="edit-crane">
+    <h1>Crane Saved. Add more details if you want.</h1>
+    <p>
+      <input type="text" name="title" value="" placeholder="Name that crane.">
+    </p>
 
-  <p>
-    <%= f.submit %>
-  </p>
-<% end %>
+    <p>
+      <textarea name="notes" placeholder="Any other notes..."></textarea>
+    </p>
 
+    <button type="button">Submit Crane Info</button>
+  </section>
+
+  <section id="thanks">
+    <h1>Thanks!</h1>
+    <button type="button">Mark Another Crane</button>
+  </section>
+
+</article>
+
+<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyDXfNaXEyjTt3epqkuCv71f0a9iST4vZCI&sensor=true"></script>
 <script>
-
   $(document).ready(function () {
-    var get_location = function() {
-      if (Modernizr.geolocation) {
-        navigator.geolocation.getCurrentPosition(fill_location);
+
+    var showState = function(state) {
+      var $articleEl = $("article");
+       $articleEl.find("section").hide();
+      if (state !== undefined) {
+        $articleEl.find("#"+state).slideToggle();
       } else {
-        // no native support; maybe try a fallback?
+        $articleEl.find("section:first-child").slideToggle();
       }
     },
-    fill_location = function(position) {
-      console.log(position);
-      $("#crane_lat").attr('value',position.coords.latitude);
-      $("#crane_lon").attr('value',position.coords.longitude);
+    placeLocation = function(position) {
+      var coords = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+      createMarker(coords);
+    },
+    createMarker = function(coords) {
+      if (coords == undefined) {
+        coords = window.mapCenterCoords;
+      }
+      var marker = new google.maps.Marker({
+        draggable: true,
+        map: window.map,
+        position: coords
+      });
+
+      $("input[name=latitude]").val(coords.lat());
+      $("input[name=longitude]").val(coords.lng());
+
+      google.maps.event.addListener(marker, 'dragend', function (event) {
+        $("input[name=latitude]").val(this.getPosition().lat());
+        $("input[name=longitude]").val(this.getPosition().lng());
+      });
+    },
+    initMap = function() {
+      /**
+       * Create the vanilla map
+       */
+      window.mapCenterCoords = new google.maps.LatLng('37.7745659', '-122.4214918');
+      var options = {
+        zoom: 12,
+        center: window.mapCenterCoords,
+        mapTypeControl: false,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+      window.map = new google.maps.Map(document.getElementById("map-canvas"), options);
     };
 
-    $("button#get-geo").on('click', function() {
-      get_location();
+    showState();
+
+    var $articleEl = $("article");
+
+    $articleEl.find("#mark-crane").find("button[type=button]").each( function(index,el) {
+      $(el).on('click', function(e){
+        e.preventDefault;
+        showState('locate');
+        initMap();
+        if ($(el).attr('data-use-geolocation')) {
+          if (Modernizr.geolocation) {
+            navigator.geolocation.getCurrentPosition(placeLocation);
+          }
+        } else {
+          createMarker();
+        }
+      });
+    });
+    $articleEl.find("#locate").find("button[type=button]").each(function(index,el){
+      $(el).on('click', function(e){
+        e.preventDefault;
+        $.ajax({
+          type: "POST",
+          url: "/cranes",
+          data: {
+            crane: {
+              lat: $("input[name=latitude]").val(),
+              lon: $("input[name=longitude]").val()
+            }
+          }
+        })
+        .fail(function(){
+          alert("Sorry but something broke. Please try again.");
+        })
+        .done(function(crane) {
+          showState('edit-crane');
+          $("#edit-crane").attr('data-crane-id', crane.id)
+        });
+      });
+    });
+    $articleEl.find("#edit-crane").find("button[type=button]").each(function(index,el){
+      $(el).on('click', function(e){
+        e.preventDefault;
+        console.log($("textarea[name=notes]").val());
+        $.ajax({
+          type: "PATCH",
+          url: "/cranes/" + $("#edit-crane").attr('data-crane-id'),
+          data: {
+            crane: {
+              title: $("input[name=title]").val(),
+              notes: $("textarea[name=notes]").val()
+            }
+          }
+        })
+        .fail(function(){
+          alert("Sorry but something broke. Please try again.");
+        })
+        .done(function() {
+          showState('thanks');
+        });
+      });
+    });
+    $articleEl.find("#thanks").find("button[type=button]").each(function(index,el){
+      $(el).on('click', function(e){
+        e.preventDefault;
+
+        location.reload();
+      });
     });
   });
-</script>
+  </script>
