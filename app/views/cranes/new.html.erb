@@ -1,0 +1,50 @@
+<h1>Jeah?</h1>
+<%= form_for :crane, url: cranes_path do |f| %>
+  <p>
+    <%= f.label :title %><br>
+    <%= f.text_field :title %>
+  </p>
+
+  <p>
+    <%= f.label :notes %><br>
+    <%= f.text_area :notes %>
+  </p>
+
+  <p>
+    <%= f.label :address %><br>
+    <%= f.text_area :address %>
+  </p>
+
+  <p>
+    Geo
+    <%= f.text_field :lat, :disabled => true %>
+    <%= f.text_field :lon, :disabled => true %>
+    <button id="get-geo" type="button">Get Current Location</button>
+  </p>
+
+  <p>
+    <%= f.submit %>
+  </p>
+<% end %>
+
+<script>
+
+  $(document).ready(function () {
+    var get_location = function() {
+      if (Modernizr.geolocation) {
+        navigator.geolocation.getCurrentPosition(fill_location);
+      } else {
+        // no native support; maybe try a fallback?
+      }
+    },
+    fill_location = function(position) {
+      console.log(position);
+      $("#crane_lat").attr('value',position.coords.latitude);
+      $("#crane_lon").attr('value',position.coords.longitude);
+    };
+
+    $("button#get-geo").on('click', function() {
+      get_location();
+    });
+  });
+</script>

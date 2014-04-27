@@ -40,3 +40,6 @@ gem 'unicorn'
 
 # Heroku
 gem 'rails_12factor', group: :production
+
+#foundation
+gem 'foundation-rails'
