@@ -3,30 +3,11 @@
 <a class="button" href="http://sfcranes.tumblr.com">View Crane Photos</a>
 <div id="map-canvas"></div>
 
-
-<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyDXfNaXEyjTt3epqkuCv71f0a9iST4vZCI&sensor=true"></script>
 <script>
   $(document).ready(function () {
-    var coords = new google.maps.LatLng('37.76126749696161', '-122.43797129218751');
-    var options = {
-      zoom: 12,
-      center: coords,
-      mapTypeControl: false,
-      navigationControlOptions: {
-        style: google.maps.NavigationControlStyle.SMALL
-      },
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    var map = new google.maps.Map(document.getElementById("map-canvas"), options);
-
+    hardHat.initMap();
     <% @cranes.each do |crane| %>
-      var craneCoords = new google.maps.LatLng(<%= crane.lat %>, <%= crane.lon %>)
-      new google.maps.Marker({
-        draggable: true,
-        position: craneCoords,
-        map: map,
-        title:"<%= crane.title || 'A crane' %>"
-      });
+      hardHat.placeMarker("<%= sanitize crane.lat %>","<%= sanitize crane.lon %>","<%= sanitize crane.title || 'A crane' %>");
     <% end %>
   });
 </script>

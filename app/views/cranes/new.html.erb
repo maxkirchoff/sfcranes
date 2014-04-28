@@ -15,145 +15,32 @@
 
 <section id="edit-crane">
   <h1>Crane Saved. Add more details if you want. Or enter your email and I'll buy you a coffee sometime!</h1>
+  <form data-abide action="/max/">
+    <p>
+      <input type="text" name="reporter_email" type="email" value="" placeholder="Your email address." pattern="email">
+    </p>
 
-  <p>
-    <input type="text" name="reporter_email" value="" placeholder="Leave me your email address.">
-  </p>
+    <p>
+      <input type="text" name="title" value="" placeholder="Name that crane.">
+    </p>
 
-  <p>
-    <input type="text" name="title" value="" placeholder="Name that crane.">
-  </p>
+    <p>
+      <textarea name="notes" placeholder="Any other notes..."></textarea>
+    </p>
 
-  <p>
-    <textarea name="notes" placeholder="Any other notes..."></textarea>
-  </p>
-
-  <button type="button">Submit Crane Info</button>
+    <button type="submit">Submit Crane Info</button>
+  </form>
 </section>
 
 <section id="thanks">
   <h1>Thanks!</h1>
   <button type="button">Mark Another Crane</button>
+  <a href="/" class="button">Back to All Cranes</a>
 </section>
 
-<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyDXfNaXEyjTt3epqkuCv71f0a9iST4vZCI&sensor=true"></script>
 <script>
   $(document).ready(function () {
-
-    var showState = function(state) {
-      var $articleEl = $("article");
-       $articleEl.find("section").hide();
-      if (state !== undefined) {
-        $articleEl.find("#"+state).slideToggle();
-      } else {
-        $articleEl.find("#mark-crane").slideToggle();
-      }
-    },
-    placeLocation = function(position) {
-      var coords = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-
-      createMarker(coords);
-    },
-    createMarker = function(coords) {
-      if (coords == undefined) {
-        coords = window.mapCenterCoords;
-      }
-      var marker = new google.maps.Marker({
-        draggable: true,
-        map: window.map,
-        position: coords
-      });
-
-      $("input[name=latitude]").val(coords.lat());
-      $("input[name=longitude]").val(coords.lng());
-
-      google.maps.event.addListener(marker, 'dragend', function (event) {
-        $("input[name=latitude]").val(this.getPosition().lat());
-        $("input[name=longitude]").val(this.getPosition().lng());
-      });
-    },
-    initMap = function() {
-      /**
-       * Create the vanilla map
-       */
-      window.mapCenterCoords = new google.maps.LatLng('37.7745659', '-122.4214918');
-      var options = {
-        zoom: 12,
-        center: window.mapCenterCoords,
-        mapTypeControl: false,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-      };
-      window.map = new google.maps.Map(document.getElementById("map-canvas"), options);
-    };
-
-    showState();
-
-    var $articleEl = $("article");
-
-    $articleEl.find("#mark-crane").find("button[type=button]").each( function(index,el) {
-      $(el).on('click', function(e){
-        e.preventDefault;
-        showState('locate');
-        initMap();
-        if ($(el).attr('data-use-geolocation')) {
-          if (Modernizr.geolocation) {
-            navigator.geolocation.getCurrentPosition(placeLocation);
-          }
-        } else {
-          createMarker();
-        }
-      });
-    });
-    $articleEl.find("#locate").find("button[type=button]").each(function(index,el){
-      $(el).on('click', function(e){
-        e.preventDefault;
-        $.ajax({
-          type: "POST",
-          url: "/cranes",
-          data: {
-            crane: {
-              lat: $("input[name=latitude]").val(),
-              lon: $("input[name=longitude]").val()
-            }
-          }
-        })
-        .fail(function(){
-          alert("Sorry but something broke. Please try again.");
-        })
-        .done(function(crane) {
-          showState('edit-crane');
-          $("#edit-crane").attr('data-crane-id', crane.id)
-        });
-      });
-    });
-    $articleEl.find("#edit-crane").find("button[type=button]").each(function(index,el){
-      $(el).on('click', function(e){
-        e.preventDefault;
-        console.log($("textarea[name=notes]").val());
-        $.ajax({
-          type: "PATCH",
-          url: "/cranes/" + $("#edit-crane").attr('data-crane-id'),
-          data: {
-            crane: {
-              title: $("input[name=title]").val(),
-              notes: $("textarea[name=notes]").val(),
-              reporter_email: $("input[name=reporter_email]").val()
-            }
-          }
-        })
-        .fail(function(){
-          alert("Sorry but something broke. Please try again.");
-        })
-        .done(function() {
-          showState('thanks');
-        });
-      });
-    });
-    $articleEl.find("#thanks").find("button[type=button]").each(function(index,el){
-      $(el).on('click', function(e){
-        e.preventDefault;
-        location.reload();
-      });
-    });
+    hardHat.showState();
+    hardHat.initButtons();
   });
   </script>

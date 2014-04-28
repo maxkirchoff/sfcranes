@@ -27,7 +27,7 @@ class CranesController < ApplicationController
 
   private
     def crane_params
-      params.require(:crane).permit(:lat, :lon, :title, :notes)
+      params.require(:crane).permit(:lat, :lon, :title, :notes, :reporter_email)
     end
 end
 
