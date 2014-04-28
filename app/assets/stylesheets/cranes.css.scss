@@ -33,3 +33,39 @@ button, .button {
     @include grid-column(6,$center:true);
   }
 }
+#legend {
+  background: #fff;
+  border: 3px solid #999;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 5px;
+  > div {
+    clear:both;
+    line-height: 30px;
+    .color {
+      width: 20px;
+      height: 20px;
+      margin: 5px;
+      float:left;
+      border: 1px solid #000;
+
+      &.green {
+        background-color: green;
+      }
+
+      &.yellow {
+        background-color:yellow;
+      }
+    }
+  }
+}
+#locate #legend {
+  display:none;
+}
+#loading {
+  text-align:center;
+  font-size: rem-calc(50);
+  position:absolute;
+  top: 50vh;
+  z-index:999;
+}

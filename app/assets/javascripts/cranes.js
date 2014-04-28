@@ -1,6 +1,18 @@
 var hardHat = {
   mapCenterCoords: new google.maps.LatLng('37.7745659', '-122.4214918'),
   map: {},
+  markerNewCrane: {
+    path: 'M0-165c-27.618 0-50 21.966-50 49.054C-50-88.849 0 0 0 0s50-88.849 50-115.946C50-143.034 27.605-165 0-165z',
+    fillColor: 'yellow',
+    fillOpacity: 1,
+    scale: .2
+  },
+  markerPhotodCrane: {
+    path: 'M0-165c-27.618 0-50 21.966-50 49.054C-50-88.849 0 0 0 0s50-88.849 50-115.946C50-143.034 27.605-165 0-165z',
+    fillColor: 'green',
+    fillOpacity: 1,
+    scale:.2
+  },
   showState: function(state) {
     var $articleEl = $("article");
     $articleEl.find("section").hide();
@@ -19,10 +31,14 @@ var hardHat = {
     if (coords == undefined) {
       coords = hardHat.mapCenterCoords;
     }
+
     var marker = new google.maps.Marker({
       draggable: true,
       map: hardHat.map,
-      position: coords
+      position: coords,
+      zIndex: 9,
+      icon: hardHat.markerNewCrane,
+      label: '<i class="map-icon-crane"></i>'
     });
 
     $("input[name=latitude]").val(coords.lat());
@@ -44,6 +60,15 @@ var hardHat = {
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     hardHat.map = new google.maps.Map(document.getElementById("map-canvas"), options);
+
+    var legend = document.createElement('div');
+    legend.id = 'legend';
+    var content = [];
+    content.push('<div><div class="color yellow"></div>Reported Crane</div>');
+    content.push('<div><div class="color green"></div>Photographed Crane</div>');
+    legend.innerHTML = content.join('');
+    legend.index = 1;
+    hardHat.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(legend);
   },
   initButtons: function() {
     var $articleEl = $("article");
@@ -54,7 +79,7 @@ var hardHat = {
         hardHat.initMap();
         if ($(el).attr('data-use-geolocation')) {
           if (Modernizr.geolocation) {
-            navigator.geolocation.getCurrentPosition(placeLocation);
+            navigator.geolocation.getCurrentPosition(hardHat.placeLocation);
           }
         } else {
           hardHat.createMarker();
@@ -112,12 +137,21 @@ var hardHat = {
       });
     });
   },
-  placeMarker: function(lat, lon, title) {
-    var craneCoords = new google.maps.LatLng(lat, lon)
-    new google.maps.Marker({
-      position: craneCoords,
+  placeMarker: function(lat, lon, photod) {
+    var craneCoords = new google.maps.LatLng(lat, lon);
+
+    var markerPin = hardHat.markerNewCrane;
+    if (photod !== undefined && !!photod) {
+      markerPin = hardHat.markerPhotodCrane;
+    }
+
+    var marker = new google.maps.Marker({
+      draggable: true,
       map: hardHat.map,
-      title: title
+      position: craneCoords,
+      zIndex: 9,
+      icon: markerPin,
+      label: '<i class="map-icon-crane"></i>'
     });
   }
 };
