@@ -1,39 +1,40 @@
-<article>
+<section id="mark-crane">
+  <h1></h1>
+  <button type="button" data-use-geolocation="true">Use my Location</button>
+  <br />
+  <button type="button">Set Location Manually</button>
+</section>
 
-  <section id="mark-crane">
-    <h1></h1>
-    <button type="button" data-use-geolocation="true">Use my Location</button>
-    <br />
-    <button type="button">Locate Manually</button>
-  </section>
+<section id="locate">
+  <h1>Set the crane location.</h1>
+  <button type="button">Save Crane Location</button>
+  <div id="map-canvas"></div>
+  <input type="hidden" name="latitude" value="">
+  <input type="hidden" name="longitude" value="">
+</section>
 
-  <section id="locate">
-    <h1></h1>
-    <div id="map-canvas"></div>
-    <input type="hidden" name="latitude" value="">
-    <input type="hidden" name="longitude" value="">
-    <button type="button">Save Crane Location</button>
-  </section>
+<section id="edit-crane">
+  <h1>Crane Saved. Add more details if you want. Or enter your email and I'll buy you a coffee sometime!</h1>
 
-  <section id="edit-crane">
-    <h1>Crane Saved. Add more details if you want.</h1>
-    <p>
-      <input type="text" name="title" value="" placeholder="Name that crane.">
-    </p>
+  <p>
+    <input type="text" name="reporter_email" value="" placeholder="Leave me your email address.">
+  </p>
 
-    <p>
-      <textarea name="notes" placeholder="Any other notes..."></textarea>
-    </p>
+  <p>
+    <input type="text" name="title" value="" placeholder="Name that crane.">
+  </p>
 
-    <button type="button">Submit Crane Info</button>
-  </section>
+  <p>
+    <textarea name="notes" placeholder="Any other notes..."></textarea>
+  </p>
 
-  <section id="thanks">
-    <h1>Thanks!</h1>
-    <button type="button">Mark Another Crane</button>
-  </section>
+  <button type="button">Submit Crane Info</button>
+</section>
 
-</article>
+<section id="thanks">
+  <h1>Thanks!</h1>
+  <button type="button">Mark Another Crane</button>
+</section>
 
 <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyDXfNaXEyjTt3epqkuCv71f0a9iST4vZCI&sensor=true"></script>
 <script>
@@ -45,7 +46,7 @@
       if (state !== undefined) {
         $articleEl.find("#"+state).slideToggle();
       } else {
-        $articleEl.find("section:first-child").slideToggle();
+        $articleEl.find("#mark-crane").slideToggle();
       }
     },
     placeLocation = function(position) {
@@ -135,7 +136,8 @@
           data: {
             crane: {
               title: $("input[name=title]").val(),
-              notes: $("textarea[name=notes]").val()
+              notes: $("textarea[name=notes]").val(),
+              reporter_email: $("input[name=reporter_email]").val()
             }
           }
         })
@@ -150,7 +152,6 @@
     $articleEl.find("#thanks").find("button[type=button]").each(function(index,el){
       $(el).on('click', function(e){
         e.preventDefault;
-
         location.reload();
       });
     });

@@ -1,0 +1,17 @@
+@import 'foundation';
+
+@import url(http://fonts.googleapis.com/css?family=Nunito:400,700,300);
+@import 'cranes';
+
+body {
+  background: #252525;
+}
+article h1 a, article h1 {
+  color: #fff;
+  text-align:center;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+article h1 a:hover {
+  color: #999;
+}
